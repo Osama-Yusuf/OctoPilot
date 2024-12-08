@@ -1,6 +1,15 @@
 # OctoPilot Helm Chart
 
-![OctoPilot](OctoPilot.png)
+<p align="center">
+  <img src="OctoPilot.png" alt="OctoPilot">
+  <br>
+  <em>OctoPilot: A Helm Chart for Seamless Kubernetes Deployments</em>
+</p>
+
+
+## OctoPilot Helm Chart
+
+A flexible Helm chart designed for deploying multiple microservices on OpenShift with a unified configuration approach. This chart provides a single source of truth for managing and deploying various microservices within your ecosystem, eliminating the need for separate Helm charts for each service.
 
 ## Table of Contents
 
@@ -16,10 +25,6 @@
     - [Upgrading](#upgrading)
     - [Uninstalling](#uninstalling)
     - [Troubleshooting](#troubleshooting)
-
-## OctoPilot Helm Chart
-
-A flexible Helm chart designed for deploying multiple microservices on OpenShift with a unified configuration approach. This chart provides a single source of truth for managing and deploying various microservices within your ecosystem, eliminating the need for separate Helm charts for each service.
 
 ### Configuration Philosophy
 
