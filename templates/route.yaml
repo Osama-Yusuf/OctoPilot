@@ -19,7 +19,7 @@ metadata:
 spec:
   to:
     kind: Service
-    name: {{ $fullName }}
+    name: {{ $fullName }}-service
     weight: 100
   port:
     targetPort: {{ $svcPort }}
