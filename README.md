@@ -3,13 +3,24 @@
 <p align="center">
   <img src="OctoPilot.png" alt="OctoPilot">
   <br>
-  <em>OctoPilot: A Helm Chart for Seamless Kubernetes Deployments</em>
+  <em>OctoPilot: A Helm Chart for Seamless Kubernetes/OpenShift Deployments</em>
 </p>
 
 
 ## OctoPilot Helm Chart
 
 A flexible Helm chart designed for deploying multiple microservices on OpenShift with a unified configuration approach. This chart provides a single source of truth for managing and deploying various microservices within your ecosystem, eliminating the need for separate Helm charts for each service.
+
+### Configuration Philosophy
+
+The chart follows a "configure once, deploy many" philosophy, where a single values file can define the deployment configuration for multiple microservices. This approach:
+
+- Reduces configuration duplication across services
+- Ensures consistency in deployment patterns
+- Simplifies maintenance and updates
+- Provides a standardized way to handle service-specific customizations
+
+Each microservice can be configured through its own values file, inheriting common configurations while allowing for service-specific overrides when needed.
 
 ## Table of Contents
 
@@ -25,17 +36,6 @@ A flexible Helm chart designed for deploying multiple microservices on OpenShift
     - [Upgrading](#upgrading)
     - [Uninstalling](#uninstalling)
     - [Troubleshooting](#troubleshooting)
-
-### Configuration Philosophy
-
-The chart follows a "configure once, deploy many" philosophy, where a single values file can define the deployment configuration for multiple microservices. This approach:
-
-- Reduces configuration duplication across services
-- Ensures consistency in deployment patterns
-- Simplifies maintenance and updates
-- Provides a standardized way to handle service-specific customizations
-
-Each microservice can be configured through its own values file, inheriting common configurations while allowing for service-specific overrides when needed.
 
 ## Features
 
