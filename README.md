@@ -1,5 +1,7 @@
 # OctoPilot Helm Chart
 
+![OctoPilot](OctoPilot.png)
+
 ## Table of Contents
 
 - [OctoPilot Helm Chart](#octopilot-helm-chart)
