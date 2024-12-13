@@ -36,6 +36,8 @@ Each microservice can be configured through its own values file, inheriting comm
     - [Upgrading](#upgrading)
     - [Uninstalling](#uninstalling)
     - [Troubleshooting](#troubleshooting)
+  - [Upcoming Features](#upcoming-features)
+    - [External Secrets Management Support](#external-secrets-management-support)
 
 ## Features
 
@@ -203,3 +205,19 @@ helm uninstall <release-name>
 ### Troubleshooting
 
 If you encounter any issues, please check the [troubleshooting guide](/troubleshooting.md).
+
+### Upcoming Features
+
+#### External Secrets Management Support
+I'm planning to add support for various external secret management solutions to enhance security in production environments:
+
+- **Sealed Secrets**: Integration with Bitnami's Sealed Secrets for encrypting secrets at rest
+- **HashiCorp Vault**: Support for dynamic secrets and centralized secret management
+- **AWS Secrets Manager**: Native integration with AWS secret management service
+- **External Secrets Operator**: Support for managing secrets across multiple providers
+
+These integrations will allow you to:
+- Store secrets securely in production environments
+- Manage secrets separately from application configuration
+- Follow security best practices for secret management
+
