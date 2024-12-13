@@ -9,7 +9,7 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ $fullName }}-route
+  name: {{ .Values.nameOverride }}-route
   labels:
     {{- include "octopilot.labels" . | nindent 4 }}
   {{- with .Values.route.annotations }}
@@ -19,14 +19,14 @@ metadata:
 spec:
   to:
     kind: Service
-    name: {{ $fullName }}-service
+    name: {{ .Values.nameOverride }}-service
     weight: 100
   port:
     targetPort: {{ $svcPort }}
   {{- if .Values.route.tls.enabled }}
   tls:
+    insecureEdgeTerminationPolicy: Redirect
     termination: edge
-    secretName: {{ .Values.nameOverride }}-secret-tls
   {{- end }}
   host: {{ (index .Values.route.hosts 0).host }}
 {{- end }}
