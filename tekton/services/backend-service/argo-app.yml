@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: backend-service
+  namespace: devops
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/mwanitest/helm-chart'
+    targetRevision: main
+    path: .
+    helm:
+      valueFiles:
+        - values/backend-values.yaml
+  destination:
+    server: 'https://api.apps.local:6443'
+    namespace: devops
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - RespectIgnoreDifferences=true
+

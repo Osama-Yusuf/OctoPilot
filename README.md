@@ -1,33 +1,18 @@
-# OctoPilot Helm Chart
+# OctoPilot: Helm Chart and Tekton Pipelines
 
 <p align="center">
   <img src="OctoPilot.png" alt="OctoPilot">
   <br>
-  <em>OctoPilot: A Helm Chart for Seamless Kubernetes/OpenShift Deployments</em>
+  <em>OctoPilot integrates both Helm charts and Tekton pipelines to streamline deployment and CI/CD processes.
+</em>
 </p>
-
-
-## OctoPilot Helm Chart
-
-A flexible Helm chart designed for deploying multiple microservices on OpenShift with a unified configuration approach. This chart provides a single source of truth for managing and deploying various microservices within your ecosystem, eliminating the need for separate Helm charts for each service.
-
-### Configuration Philosophy
-
-The chart follows a "configure once, deploy many" philosophy, where a single values file can define the deployment configuration for multiple microservices. This approach:
-
-- Reduces configuration duplication across services
-- Ensures consistency in deployment patterns
-- Simplifies maintenance and updates
-- Provides a standardized way to handle service-specific customizations
-
-Each microservice can be configured through its own values file, inheriting common configurations while allowing for service-specific overrides when needed.
 
 ## Table of Contents
 
-- [OctoPilot Helm Chart](#octopilot-helm-chart)
+- [Overview](#overview)
   - [Table of Contents](#table-of-contents)
-  - [OctoPilot Helm Chart](#octopilot-helm-chart-1)
-    - [Configuration Philosophy](#configuration-philosophy)
+  - [Configuration Philosophy](#configuration-philosophy)
+  - [Tekton Pipelines](#tekton-pipelines)
   - [Features](#features)
   - [Quick Start Guide](#quick-start-guide)
     - [Installation](#installation)
@@ -39,185 +24,119 @@ Each microservice can be configured through its own values file, inheriting comm
   - [Upcoming Features](#upcoming-features)
     - [External Secrets Management Support](#external-secrets-management-support)
 
-## Features
+## Configuration Philosophy
 
-- Standardized deployment configuration
-- Dynamic resource naming based on the microservice name defined in the values file.
-- ConfigMap & Secret management (application-specific and shared)
-- OpenShift Route configuration
-- Horizontal Pod Autoscaling
-- Health checks and probes
+The project follows a "configure once, deploy many" philosophy, where a single values file can define the deployment configuration for multiple microservices. This approach:
+
+- Reduces configuration duplication across services
+- Ensures consistency in deployment patterns
+- Simplifies maintenance and updates
+- Provides a standardized way to handle service-specific customizations
+
+Each microservice can be configured through its own configuration file, inheriting common configurations while allowing for service-specific overrides when needed.
+
+
+## Tekton Pipelines
+
+This section provides an overview of Tekton pipelines included in the OctoPilot project. The pipelines are configured to build and deploy various microservices using Tekton tasks and pipelines defined in the `tekton` directory.
+
+### Prerequisites
+
+- Kubernetes cluster
+- Tekton installed on the cluster
+- kubectl configured to access your cluster
+- Tekton CLI (tkn) installed
+
+### Running the Pipeline
+
+To trigger a pipeline for a specific service, use the `run.sh` script with the appropriate service shorthand:
+
+```bash
+./run.sh <service_shorthand>
+```
+
+Service shorthands:
+- `fs` - Frontend Service
+- `vs` - Backend Service
+
+Example:
+```bash
+./run.sh fs  # Triggers pipeline for Frontend Service
+```
+
+### Pipeline Components
+
+The pipeline includes several tasks:
+- Clone repository
+- Build Docker images
 
 ## Quick Start Guide
 
-1. Copy the base values file:
-
-   ```bash
-   cp values.yaml values/<your-microservice>-values.yaml
-
-   # Example:
-   cp values.yaml values/backend-values.yaml
-   ```
-
-2. Adjust the Configuration:
-
-   Key configurations to modify in your new values file:
-
-   - `nameOverride`: Set to your microservice name (without the '-service/s' prefix)
-   - `replicaCount`: Adjust the number of replicas
-   - `namespace`: Adjust the namespace
-   - `image`: Update repository and tag for your microservice
-
-   ```yaml
-   image:
-     repository: your-registry/your-microservice
-     tag: "1.0.0"
-   ```
-
-   - `service`: Service Configuration:
-
-   ```yaml
-   service:
-     type: ClusterIP # Service type (ClusterIP, NodePort, LoadBalancer)
-     port: 80 # The service Port to expose
-     targetPort: 8080 # The app container port to forward to
-   ```
-
-   - `secret`: Enable if needed and add your application secrets
-
-   ```yaml
-   secret:
-     enabled: true # Enable application secrets
-     data:
-       API_KEY: "xyz123" # Environment variable API_KEY
-       DB_PASS: "pass123" # Environment variable DB_PASS
-   ```
-
-   - `configMap`: Enable if needed and add your less sensitive configuration
-
-   ```yaml
-   configMap:
-     enabled: true # Enable config map
-     data:
-       API_URL: "http://api" # Environment variable API_URL
-       MODE: "production" # Environment variable MODE
-   ```
-
-   - `route`: Enable and configure if you need external access
-
-   ```yaml
-   route:
-     enabled: true # Enable external access
-     hosts:
-       - host: myapp.example.com # Public hostname
-     tls:
-       enabled: true # Enable HTTPS
-   ```
-
-   - `autoscaling`: Enable and configure if you need autoscaling
-
-   ```yaml
-   autoscaling:
-     enabled: true # Enable auto scaling
-     minReplicas: 2 # Minimum pods
-     maxReplicas: 5 # Maximum pods
-     targetCPUUtilization: 80 # Scale when CPU hits 80%
-   ```
-
 ### Installation
 
-Install your microservice:
+To install the OctoPilot project, follow these steps:
 
-```bash
-helm install <release-name> . -f values/<your-microservice>-values.yaml
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Osama-Yusuf/OctoPilot.git
+   cd OctoPilot
+   ```
 
-# Example:
-helm install backend . -f values/backend-values.yaml
-```
+2. Install necessary dependencies and tools (e.g., Helm, Tekton CLI).
+
+3. Deploy the Helm chart:
+   ```bash
+   helm install frontend -n default . -f helm-chart/values/frontend-values.yaml
+   ```
 
 ### Visiting your application
 
-Visit your microservice by running the following command:
+Once deployed, access your application via the provided service URL. Use `kubectl` to retrieve the service URL if necessary:
 
 ```bash
-  kubectl port-forward --namespace <namespace> svc/<microservice-name> <local-port>:<service-port>
-
-  # Example:
-  kubectl port-forward --namespace default svc/backend 8080:8080
+kubectl get svc
 ```
 
 ### Resources Created
 
-When you install the chart, the following Kubernetes resources are created:
-
-All resources follow the pattern `${nameOverride}-<resource>`:
-
-1. **Deployment**
-
-   - Runs your microservice containers
-   - Configures environment variables from secrets and configmaps
-   - Handles autoscaling if enabled
-
-2. **Service**
-
-   - Exposes your microservice internally
-   - Default type: ClusterIP
-   - Configurable ports
-
-3. **Service Account**
-
-   - Used for pod permissions
-
-4. **Secrets**
-
-   - Application-specific secrets for your service
-   - Access to shared secrets (like database credentials)
-   - There is one additional secret that is shared across all microservices `shared-secret`
-
-5. **ConfigMap** (if enabled)
-
-   - Stores configuration data
-   - Used for environment variables
-
-6. **Route** (if enabled)
-
-   - Provides external access to your service
-   - Configurable hostname and TLS
-
-7. **HorizontalPodAutoscaler** (if enabled)
-   - Automatically scales your pods
-   - Based on CPU utilization
-
-### Upgrading
-
-To upgrade an existing deployment:
-
-```bash
-helm upgrade <release-name> . -f values/<your-service>-values.yaml
-```
+The deployment creates the following resources:
+- Pods
+- Services
+- ConfigMaps
+- Secrets
+- HorizontalPodAutoscaler
+- Deployment
+- Route
+- ServiceAccount
 
 ### Uninstalling
 
+To uninstall the deployment:
+
 ```bash
-helm uninstall <release-name>
+helm uninstall frontend
 ```
 
 ### Troubleshooting
 
-If you encounter any issues, please check the [troubleshooting guide](/troubleshooting.md).
+For troubleshooting common issues, refer to the logs of the pods and Tekton tasks:
 
-### Upcoming Features
+```bash
+kubectl logs <pod-name>
+```
 
-#### External Secrets Management Support
-I'm planning to add support for various external secret management solutions to enhance security in production environments:
+## Upcoming Features
 
-- **Sealed Secrets**: Integration with Bitnami's Sealed Secrets for encrypting secrets at rest
-- **HashiCorp Vault**: Support for dynamic secrets and centralized secret management
-- **AWS Secrets Manager**: Native integration with AWS secret management service
-- **External Secrets Operator**: Support for managing secrets across multiple providers
+### External Secrets Management Support
+
+Support for external secrets management is planned to enhance security and flexibility in handling sensitive information. The upcoming integrations include:
+
+- **Sealed Secrets**: Integration with Bitnami's Sealed Secrets for encrypting secrets at rest.
+- **HashiCorp Vault**: Support for dynamic secrets and centralized secret management.
+- **AWS Secrets Manager**: Native integration with AWS secret management service.
+- **External Secrets Operator**: Support for managing secrets across multiple providers.
 
 These integrations will allow you to:
-- Store secrets securely in production environments
-- Manage secrets separately from application configuration
-- Follow security best practices for secret management
-
+- Store secrets securely in production environments.
+- Manage secrets separately from application configuration.
+- Follow security best practices for secret management.

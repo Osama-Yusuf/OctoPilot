@@ -1,0 +1,87 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: backend-service-trigger-template
+  namespace: devops
+spec:
+  params:
+    - name: CLONE_TASK_IMAGE
+    - name: MAVEN_TASK_IMAGE
+    - name: DOCKER_TASK_IMAGE
+    - name: REPO_DIR
+    - name: BRANCH
+    - name: APP_NAME
+    - name: APP_PORT
+    - name: GH_TOKEN
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        generateName: backend-service-pipeline-run-
+        namespace: devops
+      spec:
+        pipelineRef:
+          name: backend-service-pipeline
+        params:
+          - name: CLONE_TASK_IMAGE
+            value: $(tt.params.CLONE_TASK_IMAGE)
+          - name: MAVEN_TASK_IMAGE
+            value: $(tt.params.MAVEN_TASK_IMAGE)
+          - name: DOCKER_TASK_IMAGE
+            value: $(tt.params.DOCKER_TASK_IMAGE)
+          - name: REPO_DIR
+            value: $(tt.params.REPO_DIR)
+          - name: BRANCH
+            value: $(tt.params.BRANCH)
+          - name: APP_NAME
+            value: $(tt.params.APP_NAME)
+          - name: APP_PORT
+            value: $(tt.params.APP_PORT)
+          - name: GH_TOKEN
+            value: $(secrets.github-token.token)
+        workspaces:
+          - name: pipeline-backend-service-workspace
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: backend-service-trigger-binding
+  namespace: devops
+spec:
+  params:
+    - name: CLONE_TASK_IMAGE
+      value: alpine/git
+    - name: MAVEN_TASK_IMAGE
+      value: registry.access.redhat.com/ubi8/openjdk-21
+    - name: DOCKER_TASK_IMAGE
+      value: quay.io/buildah/stable
+    - name: REPO_DIR
+      value: backend-service
+    - name: BRANCH
+      value: $(body.ref)
+    - name: APP_NAME
+      value: backend-service
+    - name: APP_PORT
+      value: "8080"
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: backend-service-webhook
+  namespace: devops
+spec:
+  serviceAccountName: pipeline
+  triggers:
+    - name: backend-service-trigger
+      bindings:
+        - ref: backend-service-trigger-binding
+      template:
+        ref: backend-service-trigger-template
