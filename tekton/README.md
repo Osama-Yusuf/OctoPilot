@@ -20,6 +20,20 @@ This repository contains Tekton pipeline configurations for building and deployi
 - kubectl configured to access your cluster
 - Tekton CLI (tkn) installed
 
+```
+# For Windows
+choco install tektoncd-cli --confirm
+choco install kubernetes-cli
+choco install kubernetes-helm
+choco install openshift-cli
+
+# For Mac & Linux
+brew install tektoncd-cli
+brew install kubernetes-cli
+brew install helm
+brew install openshift-cli
+```
+
 ## Available Services
 
 The pipeline supports the following services:
@@ -106,25 +120,56 @@ Remember to:
 - Test the pipeline thoroughly before committing
 - Update any relevant documentation
 
-## Tekton [Hub](https://hub.tekton.dev/)
-You can use Tekton Hub to not write everything from scratch. You can start from where others finish.
-
+## The Tekton Trigger
+For tekton to be auto triggered on changes on any source code repo manager you'll need to install tekton crds to be able to do so
 
 ```
-# to search online tasks
-tkn hub search clone
-tkn hub search build
-
-# to get online task manifest
-tkn hub get task git-clone
-
-# to get readme of task
-tkn hub info task git-clone
-
-# to install 
-tkn hub install task git-clone
+# Install and set up Tekton Triggers
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
 ```
 
+### Note: This would work on kuberenetes without an issue but on openshift you'll need to update the userid to an id that matches the openshift user range
+Afterwards you must have a listener for each service like the one in services/backend-service/tekton-listener-trigger.yaml
+Then provision a route for your service webhook service like the one in services/backend-service/tekton-listener-route.yaml
+
+```
+kubectl apply -f services/backend-service/tekton-listener-trigger.yaml
+kubectl apply -f services/backend-service/tekton-listener-route.yaml
+```
+
+### You can now test your new webhook listener with a post request
+
+```
+curl -k -X POST \
+ https://backend-service-webhook.apps.local \
+ -H 'Content-Type: application/json' \
+ -d '{"branch": "main"}'
+```
+
+### Now how to deploy your microservice with helm
+
+```
+# After the pipeline finishes
+cd ../helm-chart
+
+# Pull new changes (which are the new image name and tag)
+git pull
+
+# Now make sure you're on the default project
+oc project default
+
+# Now run the following command 
+helm upgrade --install backend -n default . -f values/backend-values.yaml
+
+# Now lets check if the pod got replaced with a new one
+oc get pods
+
+# Now lets get the domain name
+oc get route
+```
 
 ## Notes
 

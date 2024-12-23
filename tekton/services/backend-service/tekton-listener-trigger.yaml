@@ -1,87 +1,61 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: backend-service-trigger-template
+  name: vessel-service-trigger-template
   namespace: devops
 spec:
   params:
-    - name: CLONE_TASK_IMAGE
-    - name: MAVEN_TASK_IMAGE
-    - name: DOCKER_TASK_IMAGE
-    - name: REPO_DIR
     - name: BRANCH
-    - name: APP_NAME
-    - name: APP_PORT
-    - name: GH_TOKEN
   resourcetemplates:
     - apiVersion: tekton.dev/v1
       kind: PipelineRun
       metadata:
-        generateName: backend-service-pipeline-run-
+        generateName: vessel-service-pipeline-run-
         namespace: devops
       spec:
         pipelineRef:
-          name: backend-service-pipeline
+          name: vessel-service-pipeline
+        taskRunTemplate:
+          serviceAccountName: pipeline
+        timeouts:
+          pipeline: 1h0m0s
         params:
-          - name: CLONE_TASK_IMAGE
-            value: $(tt.params.CLONE_TASK_IMAGE)
-          - name: MAVEN_TASK_IMAGE
-            value: $(tt.params.MAVEN_TASK_IMAGE)
-          - name: DOCKER_TASK_IMAGE
-            value: $(tt.params.DOCKER_TASK_IMAGE)
-          - name: REPO_DIR
-            value: $(tt.params.REPO_DIR)
           - name: BRANCH
             value: $(tt.params.BRANCH)
-          - name: APP_NAME
-            value: $(tt.params.APP_NAME)
-          - name: APP_PORT
-            value: $(tt.params.APP_PORT)
-          - name: GH_TOKEN
-            value: $(secrets.github-token.token)
         workspaces:
-          - name: pipeline-backend-service-workspace
+          - name: pipeline-vessel-service-workspace
             volumeClaimTemplate:
+              metadata:
+                creationTimestamp: null
               spec:
                 accessModes:
                   - ReadWriteOnce
                 resources:
                   requests:
                     storage: 1Gi
+                storageClassName: ibm-spectrum-scale-sample
+                volumeMode: Filesystem
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: backend-service-trigger-binding
+  name: vessel-service-trigger-binding
   namespace: devops
 spec:
   params:
-    - name: CLONE_TASK_IMAGE
-      value: alpine/git
-    - name: MAVEN_TASK_IMAGE
-      value: registry.access.redhat.com/ubi8/openjdk-21
-    - name: DOCKER_TASK_IMAGE
-      value: quay.io/buildah/stable
-    - name: REPO_DIR
-      value: backend-service
     - name: BRANCH
-      value: $(body.ref)
-    - name: APP_NAME
-      value: backend-service
-    - name: APP_PORT
-      value: "8080"
-
+      value: $(body.branch)
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: backend-service-webhook
+  name: vessel-service-webhook
   namespace: devops
 spec:
   serviceAccountName: pipeline
   triggers:
-    - name: backend-service-trigger
+    - name: vessel-service-trigger
       bindings:
-        - ref: backend-service-trigger-binding
+        - ref: vessel-service-trigger-binding
       template:
-        ref: backend-service-trigger-template
+        ref: vessel-service-trigger-template
