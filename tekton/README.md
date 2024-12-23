@@ -39,7 +39,7 @@ brew install openshift-cli
 The pipeline supports the following services:
 
 - Frontend Service (fs)
-- backend Service (vs)
+- backend Service (bs)
 
 ## Running the Pipeline
 
@@ -51,7 +51,7 @@ To trigger a pipeline for a specific service, use the `run.sh` script with the a
 
 Service shorthands:
 - `fs` - Frontend Service
-- `vs` - backend Service
+- `bs` - backend Service
 
 Example:
 ```bash
