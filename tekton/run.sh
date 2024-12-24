@@ -56,3 +56,4 @@ tkn pr logs -f $folder-pipeline-run-24
 # ^.*Get:.*$\n?
 
 # kubectl create secret generic github-token --from-literal=token=<your_github_token> -n devops
+# https://github.com/brightzheng100/tekton-pipeline-example/tree/master
