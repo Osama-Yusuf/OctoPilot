@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: backend-service
+  name: frontend-service
   namespace: devops
 spec:
   project: default
@@ -11,7 +11,7 @@ spec:
     path: ./helm-chart/
     helm:
       valueFiles:
-        - values/backend-values.yaml
+        - values/frontend-values.yaml
   destination:
     server: 'https://api.apps.local:6443'   # ArgoCD route
     namespace: default                      # the ns where the application will be deployed

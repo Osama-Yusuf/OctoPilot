@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: backend-service-trigger-template
+  name: frontend-service-trigger-template
   namespace: devops
 spec:
   params:
@@ -10,11 +10,11 @@ spec:
     - apiVersion: tekton.dev/v1
       kind: PipelineRun
       metadata:
-        generateName: backend-service-pipeline-run-
+        generateName: frontend-service-pipeline-run-
         namespace: devops
       spec:
         pipelineRef:
-          name: backend-service-pipeline
+          name: frontend-service-pipeline
         taskRunTemplate:
           serviceAccountName: pipeline
         timeouts:
@@ -23,7 +23,7 @@ spec:
           - name: BRANCH
             value: $(tt.params.BRANCH)
         workspaces:
-          - name: pipeline-backend-service-workspace
+          - name: pipeline-frontend-service-workspace
             volumeClaimTemplate:
               metadata:
                 creationTimestamp: null
@@ -39,7 +39,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: backend-service-trigger-binding
+  name: frontend-service-trigger-binding
   namespace: devops
 spec:
   params:
@@ -49,13 +49,13 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: backend-service-webhook
+  name: frontend-service-webhook
   namespace: devops
 spec:
   serviceAccountName: pipeline
   triggers:
-    - name: backend-service-trigger
+    - name: frontend-service-trigger
       bindings:
-        - ref: backend-service-trigger-binding
+        - ref: frontend-service-trigger-binding
       template:
-        ref: backend-service-trigger-template
+        ref: frontend-service-trigger-template
