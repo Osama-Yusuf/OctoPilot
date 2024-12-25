@@ -1,4 +1,4 @@
-# OctoPilot: Helm Chart and Tekton Pipelines
+# OctoPilot: Helm Chart, Tekton Pipelines and ArgoCD Apps
 
 <p align="center">
   <img src="OctoPilot.png" alt="OctoPilot">
