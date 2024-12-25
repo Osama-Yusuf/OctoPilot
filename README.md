@@ -3,7 +3,7 @@
 <p align="center">
   <img src="OctoPilot.png" alt="OctoPilot">
   <br>
-  <em>OctoPilot integrates both Helm charts and Tekton pipelines to streamline deployment and CI/CD processes.
+  <em>OctoPilot integrates both Helm charts, Tekton pipelines & ArgoCD to streamline deployment and CI/CD processes.
 </em>
 </p>
 
