@@ -40,13 +40,25 @@ spec:
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
           env:
-            {{/* Shared Secret environment variables */}}
+            {{/* Shared Secret handling */}}
+            {{- if .Values.sharedSecret.use }}
             {{- range $key, $value := .Values.sharedSecret.data }}
             - name: {{ $key }}
               valueFrom:
                 secretKeyRef:
-                  name: shared-secret
+                  name: {{ $.Values.sharedSecret.name }}
                   key: {{ $key }}
+            {{- end }}
+            {{- end }}
+            {{/* Application Secret environment variables */}}
+            {{- if .Values.secret.enabled }}
+            {{- range $key, $value := .Values.secret.data }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.nameOverride }}-secret
+                  key: {{ $key }}
+            {{- end }}
             {{- end }}
             {{/* Application Secret environment variables */}}
             {{- if .Values.secret.enabled }}

@@ -32,6 +32,10 @@ podLabels: {}
 
 podSecurityContext: {}
   # fsGroup: 2000
+  # runAsUser: 1000680000 # A valid UID within the range (for OCP)
+  # runAsGroup: 1000680000 # A valid GID within the range (for OCP)
+  # fsGroup: 1000680000 # A valid GID within the range (for OCP)
+
 
 securityContext: {}
   # capabilities:
@@ -40,11 +44,14 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
+  #
+  # runAsUser: 1000680000 # A valid UID within the range (for OCP)
+  # runAsGroup: 1000680000 # A valid GID within the range (for OCP)
 
 # Shared Secret configuration (shared across microservices)
 sharedSecret:
   name: shared-secret
-  create: true  # Set to false by default since it might exist
+  use: false # if false won't use and if true it will check if it's exist if not will create and use 
   data:
     DB_URL: postgresql://user:pass@localhost:5432/database_name
     DB_USER: user
